@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRREGULAR VERBS MASTER - Tofik Afandi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-blue: #00ffff;
+            --bg-dark: #050508;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .aurora {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 30%, rgba(255, 0, 255, 0.1), transparent 40%),
+                        radial-gradient(circle at 80% 70%, rgba(0, 255, 255, 0.1), transparent 40%);
+            filter: blur(80px);
+        }
+
+        .font-neon { font-family: 'Orbitron', sans-serif; }
+        
+        .pop-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 4px 4px 0px var(--neon-pink);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pop-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--neon-blue);
+            box-shadow: 4px 4px 0px var(--neon-blue);
+        }
+
+        .category-card {
+            cursor: pointer;
+            text-align: center;
+            padding: 1.5rem 1rem;
+        }
+
+        .access-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .access-input:focus {
+            border-color: var(--neon-blue);
+            outline: none;
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        .btn-play {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            color: var(--neon-blue);
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+
+        .btn-play:hover:not(:disabled) {
+            background: var(--neon-blue);
+            color: black;
+            transform: scale(1.1);
+        }
+
+        .btn-play.playing {
+            background: var(--neon-blue);
+            color: black;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
+
+        .fs-toggle {
+            position: fixed;
+            top: 1rem; right: 1rem;
+            z-index: 100;
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-icon-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.6rem;
+            border-radius: 0.75rem;
+            transition: 0.3s;
+        }
+        .nav-icon-btn:hover {
+            background: var(--neon-pink);
+            color: white;
+            border-color: var(--neon-pink);
+        }
+
+        .verb-row {
+            transition: 0.3s;
+            border-left: 3px solid transparent;
+        }
+        .verb-row:hover {
+            background: rgba(255,255,255,0.06);
+            border-left-color: var(--neon-blue);
+        }
+
+        .pronunciation-text {
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.3);
+            font-style: italic;
+            display: block;
+            margin-top: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .verb-grid-header { display: none; }
+            .verb-cell-label { 
+                font-size: 0.6rem; 
+                display: block; 
+                color: rgba(255,255,255,0.2); 
+                text-transform: uppercase;
+                margin-bottom: 2px;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="aurora"></div>
+    
+    <div class="fs-toggle" onclick="toggleFullscreen()">
+        <i data-lucide="maximize" id="fs-icon" class="w-4 h-4"></i>
+    </div>
+
+    <div id="app" class="max-w-4xl mx-auto pt-6 pb-32">
+        <!-- Konten diisi oleh JavaScript -->
+    </div>
+
+    <footer class="fixed bottom-0 left-0 w-full p-3 bg-black/90 backdrop-blur-md border-t border-white/10 z-50">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+            <div class="text-[9px] font-black tracking-widest uppercase text-white/40">
+                Created by: <span class="text-cyan-400">Tofik Afandi</span> | ES Teacher
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="https://wa.me/6281387642599" target="_blank" class="flex items-center gap-1 text-white/50 hover:text-green-400 text-[9px] font-bold transition-colors">
+                    <i data-lucide="message-circle" class="w-3 h-3"></i> 081387642599
+                </a>
+                <a href="https://www.tiktok.com/@tofik.afandi" target="_blank" class="flex items-center gap-1 text-white/50 hover:text-pink-400 text-[9px] font-bold transition-colors">
+                    <i data-lucide="music-2" class="w-3 h-3"></i> @tofik.afandi
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const ACCESS_CODE = "grey";
+
+        let state = {
+            isAuthorized: false,
+            view: 'main', 
+            selectedCategory: null
+        };
+
+        const verbCategories = [
+            {
+                id: "same_all",
+                title: "Tiga Bentuk Sama",
+                desc: "V1, V2, dan V3 identik.",
+                color: "text-cyan-400",
+                icon: "layers",
+                verbs: [
+                    { v1: "Bet", v2: "Bet", v3: "Bet", p1: "/bet/", p2: "/bet/", p3: "/bet/", arti: "Bertaruh" },
+                    { v1: "Cost", v2: "Cost", v3: "Cost", p1: "/kɔːst/", p2: "/kɔːst/", p3: "/kɔːst/", arti: "Berharga" },
+                    { v1: "Cut", v2: "Cut", v3: "Cut", p1: "/kʌt/", p2: "/kʌt/", p3: "/kʌt/", arti: "Memotong" },
+                    { v1: "Hit", v2: "Hit", v3: "Hit", p1: "/hɪt/", p2: "/hɪt/", p3: "/hɪt/", arti: "Memukul" },
+                    { v1: "Hurt", v2: "Hurt", v3: "Hurt", p1: "/hɜːrt/", p2: "/hɜːrt/", p3: "/hɜːrt/", arti: "Melukai" },
+                    { v1: "Let", v2: "Let", v3: "Let", p1: "/let/", p2: "/let/", p3: "/let/", arti: "Membiarkan" },
+                    { v1: "Put", v2: "Put", v3: "Put", p1: "/pʊt/", p2: "/pʊt/", p3: "/pʊt/", arti: "Meletakkan" },
+                    { v1: "Read", v2: "Read", v3: "Read", p1: "/riːd/", p2: "/red/", p3: "/red/", arti: "Membaca" },
+                    { v1: "Set", v2: "Set", v3: "Set", p1: "/set/", p2: "/set/", p3: "/set/", arti: "Mengatur" },
+                    { v1: "Shut", v2: "Shut", v3: "Shut", p1: "/ʃʌt/", p2: "/ʃʌt/", p3: "/ʃʌt/", arti: "Menutup" },
+                    { v1: "Spread", v2: "Spread", v3: "Spread", p1: "/spred/", p2: "/spred/", p3: "/spred/", arti: "Menyebar" }
+                ]
+            },
+            {
+                id: "same_v2_v3",
+                title: "V2 dan V3 Sama",
+                desc: "Past & Participle sama.",
+                color: "text-pink-500",
+                icon: "copy",
+                verbs: [
+                    { v1: "Bend", v2: "Bent", v3: "Bent", p1: "/bend/", p2: "/bent/", p3: "/bent/", arti: "Membungkuk" },
+                    { v1: "Build", v2: "Built", v3: "Built", p1: "/bɪld/", p2: "/bɪlt/", p3: "/bɪlt/", arti: "Membangun" },
+                    { v1: "Burn", v2: "Burnt", v3: "Burnt", p1: "/bɜːrn/", p2: "/bɜːrnt/", p3: "/bɜːrnt/", arti: "Membakar" },
+                    { v1: "Keep", v2: "Kept", v3: "Kept", p1: "/kiːp/", p2: "/kept/", p3: "/kept/", arti: "Menjaga" },
+                    { v1: "Leave", v2: "Left", v3: "Left", p1: "/liːv/", p2: "/left/", p3: "/left/", arti: "Meninggalkan" },
+                    { v1: "Lose", v2: "Lost", v3: "Lost", p1: "/luːz/", p2: "/lɒst/", p3: "/lɒst/", arti: "Kalah/Hilang" },
+                    { v1: "Send", v2: "Sent", v3: "Sent", p1: "/send/", p2: "/sent/", p3: "/sent/", arti: "Mengirim" },
+                    { v1: "Sleep", v2: "Slept", v3: "Slept", p1: "/sliːp/", p2: "/slept/", p3: "/slept/", arti: "Tidur" },
+                    { v1: "Spend", v2: "Spent", v3: "Spent", p1: "/spend/", p2: "/sent/", p3: "/sent/", arti: "Habiskan" },
+                    { v1: "Bring", v2: "Brought", v3: "Brought", p1: "/brɪŋ/", p2: "/brɔːt/", p3: "/brɔːt/", arti: "Membawa" },
+                    { v1: "Buy", v2: "Bought", v3: "Bought", p1: "/baɪ/", p2: "/bɔːt/", p3: "/bɔːt/", arti: "Membeli" },
+                    { v1: "Catch", v2: "Caught", v3: "Caught", p1: "/kætʃ/", p2: "/kɔːt/", p3: "/kɔːt/", arti: "Menangkap" },
+                    { v1: "Feel", v2: "Felt", v3: "Felt", p1: "/fiːl/", p2: "/felt/", p3: "/felt/", arti: "Merasakan" },
+                    { v1: "Find", v2: "Found", v3: "Found", p1: "/faɪnd/", p2: "/faʊnd/", p3: "/faʊnd/", arti: "Menemukan" },
+                    { v1: "Get", v2: "Got", v3: "Got", p1: "/ɡet/", p2: "/ɡɒt/", p3: "/ɡɒt/", arti: "Mendapatkan" },
+                    { v1: "Have", v2: "Had", v3: "Had", p1: "/hæv/", p2: "/hæd/", p3: "/hæd/", arti: "Mempunyai" },
+                    { v1: "Hear", v2: "Heard", v3: "Heard", p1: "/hɪər/", p2: "/hɜːrd/", p3: "/hɜːrd/", arti: "Mendengar" },
+                    { v1: "Hold", v2: "Held", v3: "Held", p1: "/hoʊld/", p2: "/held/", p3: "/held/", arti: "Memegang" },
+                    { v1: "Make", v2: "Made", v3: "Made", p1: "/meɪk/", p2: "/meɪd/", p3: "/meɪd/", arti: "Membuat" },
+                    { v1: "Pay", v2: "Paid", v3: "Paid", p1: "/peɪ/", p2: "/peɪd/", p3: "/peɪd/", arti: "Membayar" },
+                    { v1: "Say", v2: "Said", v3: "Said", p1: "/seɪ/", p2: "/sed/", p3: "/sed/", arti: "Mengatakan" },
+                    { v1: "Sell", v2: "Sold", v3: "Sold", p1: "/sel/", p2: "/soʊld/", p3: "/soʊld/", arti: "Menjual" },
+                    { v1: "Sit", v2: "Sat", v3: "Sat", p1: "/sɪt/", p2: "/sæt/", p3: "/sæt/", arti: "Duduk" },
+                    { v1: "Teach", v2: "Taught", v3: "Taught", p1: "/tiːtʃ/", p2: "/tɔːt/", p3: "/tɔːt/", arti: "Mengajar" },
+                    { v1: "Tell", v2: "Told", v3: "Told", p1: "/tel/", p2: "/toʊld/", p3: "/toʊld/", arti: "Bercerita" },
+                    { v1: "Think", v2: "Thought", v3: "Thought", p1: "/θɪŋk/", p2: "/θɔːt/", p3: "/θɔːt/", arti: "Berpikir" },
+                    { v1: "Understand", v2: "Understood", v3: "Understood", p1: "/ˌʌndərˈstænd/", p2: "/ˌʌndərˈstʊd/", p3: "/ˌʌndərˈstʊd/", arti: "Mengerti" },
+                    { v1: "Win", v2: "Won", v3: "Won", p1: "/wɪn/", p2: "/wʌn/", p3: "/wʌn/", arti: "Menang" }
+                ]
+            },
+            {
+                id: "same_v1_v3",
+                title: "V1 dan V3 Sama",
+                desc: "Bentuk awal kembali di V3.",
+                color: "text-yellow-400",
+                icon: "refresh-cw",
+                verbs: [
+                    { v1: "Become", v2: "Became", v3: "Become", p1: "/bɪˈkʌm/", p2: "/bɪˈkeɪm/", p3: "/bɪˈkʌm/", arti: "Menjadi" },
+                    { v1: "Come", v2: "Came", v3: "Come", p1: "/kʌm/", p2: "/keɪm/", p3: "/kʌm/", arti: "Datang" },
+                    { v1: "Run", v2: "Ran", v3: "Run", p1: "/rʌn/", p2: "/ræn/", p3: "/rʌn/", arti: "Berlari" }
+                ]
+            },
+            {
+                id: "different_all",
+                title: "Tiga Bentuk Berbeda",
+                desc: "Memiliki pola vokal yang berubah.",
+                color: "text-purple-400",
+                icon: "shuffle",
+                verbs: [
+                    { v1: "Begin", v2: "Began", v3: "Begun", p1: "/bɪˈɡɪn/", p2: "/bɪˈɡæn/", p3: "/bɪˈɡʌn/", arti: "Mulai" },
+                    { v1: "Drink", v2: "Drank", v3: "Drunk", p1: "/drɪŋk/", p2: "/dræŋk/", p3: "/drʌŋk/", arti: "Minum" },
+                    { v1: "Ring", v2: "Rang", v3: "Rung", p1: "/rɪŋ/", p2: "/ræŋ/", p3: "/rʌŋ/", arti: "Berdering" },
+                    { v1: "Sing", v2: "Sang", v3: "Sung", p1: "/sɪŋ/", p2: "/sæŋ/", p3: "/sʌŋ/", arti: "Menyanyi" },
+                    { v1: "Sink", v2: "Sank", v3: "Sunk", p1: "/sɪŋk/", p2: "/sæŋk/", p3: "/sʌŋk/", arti: "Tenggelam" },
+                    { v1: "Swim", v2: "Swam", v3: "Swum", p1: "/swɪm/", p2: "/swæm/", p3: "/swʌm/", arti: "Berenang" },
+                    { v1: "Bite", v2: "Bit", v3: "Bitten", p1: "/baɪt/", p2: "/bɪt/", p3: "/ˈbɪt.ən/", arti: "Menggigit" },
+                    { v1: "Blow", v2: "Blew", v3: "Blown", p1: "/bloʊ/", p2: "/bluː/", p3: "/bloʊn/", arti: "Meniup" },
+                    { v1: "Break", v2: "Broke", v3: "Broken", p1: "/breɪk/", p2: "/broʊk/", p3: "/ˈbroʊ.kən/", arti: "Memecahkan" },
+                    { v1: "Choose", v2: "Chose", v3: "Chosen", p1: "/tʃuːz/", p2: "/tʃoʊz/", p3: "/ˈtʃoʊ.zən/", arti: "Memilih" },
+                    { v1: "Do", v2: "Did", v3: "Done", p1: "/duː/", p2: "/dɪd/", p3: "/dʌn/", arti: "Lakukan" },
+                    { v1: "Draw", v2: "Drew", v3: "Drawn", p1: "/drɔː/", p2: "/druː/", p3: "/drɔːn/", arti: "Gambar" },
+                    { v1: "Drive", v2: "Drove", v3: "Driven", p1: "/draɪv/", p2: "/droʊv/", p3: "/ˈdrɪv.ən/", arti: "Mengemudi" },
+                    { v1: "Eat", v2: "Ate", v3: "Eaten", p1: "/iːt/", p2: "/eɪt/", p3: "/ˈiː.tən/", arti: "Makan" },
+                    { v1: "Fall", v2: "Fell", v3: "Fallen", p1: "/fɔːl/", p2: "/fel/", p3: "/ˈfɔː.lən/", arti: "Jatuh" },
+                    { v1: "Fly", v2: "Flew", v3: "Flown", p1: "/flaɪ/", p2: "/fluː/", p3: "/floʊn/", arti: "Terbang" },
+                    { v1: "Forget", v2: "Forgot", v3: "Forgotten", p1: "/fərˈɡet/", p2: "/fərˈɡɒt/", p3: "/fərˈɡɒt.ən/", arti: "Lupa" },
+                    { v1: "Give", v2: "Gave", v3: "Given", p1: "/ɡɪv/", p2: "/ɡeɪv/", p3: "/ˈɡɪv.ən/", arti: "Memberi" },
+                    { v1: "Go", v2: "Went", v3: "Gone", p1: "/ɡoʊ/", p2: "/went/", p3: "/ɡɒn/", arti: "Pergi" },
+                    { v1: "Grow", v2: "Grew", v3: "Grown", p1: "/ɡroʊ/", p2: "/ɡruː/", p3: "/ɡroʊn/", arti: "Tumbuh" },
+                    { v1: "Know", v2: "Knew", v3: "Known", p1: "/noʊ/", p2: "/nuː/", p3: "/noʊn/", arti: "Tahu" },
+                    { v1: "Ride", v2: "Rode", v3: "Ridden", p1: "/raɪd/", p2: "/roʊd/", p3: "/ˈrɪd.ən/", arti: "Mengendara" },
+                    { v1: "Rise", v2: "Rose", v3: "Risen", p1: "/raɪz/", p2: "/roʊz/", p3: "/ˈrɪz.ən/", arti: "Terbit" },
+                    { v1: "See", v2: "Saw", v3: "Seen", p1: "/siː/", p2: "/sɔː/", p3: "/siːn/", arti: "Melihat" },
+                    { v1: "Speak", v2: "Spoke", v3: "Spoken", p1: "/spiːk/", p2: "/spoʊk/", p3: "/ˈspoʊ.kən/", arti: "Berbicara" },
+                    { v1: "Steal", v2: "Stole", v3: "Stolen", p1: "/stiːl/", p2: "/stoʊl/", p3: "/ˈstoʊ.lən/", arti: "Mencuri" },
+                    { v1: "Take", v2: "Took", v3: "Taken", p1: "/teɪk/", p2: "/tʊk/", p3: "/ˈteɪ.kən/", arti: "Ambil" },
+                    { v1: "Throw", v2: "Threw", v3: "Thrown", p1: "/θroʊ/", p2: "/θruː/", p3: "/θroʊn/", arti: "Lempar" },
+                    { v1: "Wake", v2: "Woke", v3: "Woken", p1: "/weɪk/", p2: "/woʊk/", p3: "/ˈwoʊ.kən/", arti: "Bangun" },
+                    { v1: "Write", v2: "Wrote", v3: "Written", p1: "/raɪt/", p2: "/roʊt/", p3: "/ˈrɪt.ən/", arti: "Menulis" }
+                ]
+            }
+        ];
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+            } else {
+                document.exitFullscreen().catch(err => console.log(err));
+            }
+        }
+
+        function checkAccess() {
+            const input = document.getElementById('accessInput');
+            if (input.value.toLowerCase() === ACCESS_CODE) {
+                state.isAuthorized = true;
+                render();
+            } else {
+                input.classList.add('border-red-500', 'animate-shake');
+                setTimeout(() => input.classList.remove('border-red-500', 'animate-shake'), 500);
+            }
+        }
+
+        function navigateTo(view, catId = null) {
+            state.view = view;
+            state.selectedCategory = catId;
+            window.scrollTo(0,0);
+            render();
+        }
+
+        function speakVerb(v1, v2, v3, btn) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            
+            let sV1 = v1;
+            let sV2 = (v2.toLowerCase() === 'read') ? 'red' : v2;
+            let sV3 = (v3.toLowerCase() === 'read') ? 'red' : v3;
+
+            const utterance = new SpeechSynthesisUtterance(`${sV1}, ${sV2}, ${sV3}`);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.7;
+
+            const voices = window.speechSynthesis.getVoices();
+            const voice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google')) || voices.find(v => v.lang.startsWith('en'));
+            if (voice) utterance.voice = voice;
+
+            utterance.onstart = () => btn.classList.add('playing');
+            utterance.onend = () => btn.classList.remove('playing');
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+            
+            if (!state.isAuthorized) {
+                app.innerHTML = `
+                    <div class="flex flex-col items-center justify-center min-h-[60vh] px-4">
+                        <div class="text-center mb-6">
+                            <h1 class="font-neon text-3xl text-pink-500 font-black italic uppercase">VERB ACCESS</h1>
+                            <p class="text-white/30 text-[9px] tracking-widest uppercase mt-1">Sistem Terkunci</p>
+                        </div>
+                        <div class="pop-card p-8 rounded-2xl w-full max-w-xs">
+                            <input type="password" id="accessInput" placeholder="KODE" 
+                                class="access-input w-full py-3 rounded-lg mb-4 text-lg uppercase tracking-widest"
+                                onkeypress="if(event.key==='Enter') checkAccess()">
+                            <button onclick="checkAccess()" class="w-full bg-white text-black font-black py-3 rounded-lg hover:bg-cyan-400 transition-all uppercase text-sm tracking-widest">UNLOCK</button>
+                        </div>
+                    </div>
+                `;
+            } else if (state.view === 'main') {
+                app.innerHTML = `
+                    <div class="text-center mb-10 px-4">
+                        <h1 class="font-neon text-4xl sm:text-6xl text-pink-500 font-black italic uppercase leading-none">IRREGULAR</h1>
+                        <h2 class="font-neon text-2xl sm:text-4xl text-cyan-400 font-black italic uppercase">VERBS MASTER</h2>
+                        <p class="text-white/30 text-[9px] mt-4 tracking-[0.4em] uppercase">Mulai Belajar Sekarang</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4">
+                        ${verbCategories.map(cat => `
+                            <div onclick="navigateTo('detail', '${cat.id}')" class="pop-card category-card rounded-2xl group">
+                                <i data-lucide="${cat.icon}" class="w-8 h-8 mx-auto mb-3 ${cat.color} opacity-70 group-hover:scale-110 transition-transform"></i>
+                                <h3 class="font-neon text-sm font-black italic uppercase ${cat.color}">${cat.title}</h3>
+                                <p class="text-white/30 text-[9px] mt-1 italic">${cat.desc}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (state.view === 'detail') {
+                const cat = verbCategories.find(c => c.id === state.selectedCategory);
+                app.innerHTML = `
+                    <div class="flex items-center justify-between mb-8 px-4">
+                        <button onclick="navigateTo('main')" class="nav-icon-btn text-white/50">
+                            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                        </button>
+                        <div class="text-center">
+                            <h2 class="font-neon text-base ${cat.color} font-black italic uppercase tracking-tighter">${cat.title}</h2>
+                            <p class="text-[8px] text-white/20 uppercase tracking-widest">${cat.verbs.length} Words</p>
+                        </div>
+                        <button onclick="navigateTo('main')" class="nav-icon-btn text-white/50">
+                            <i data-lucide="home" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+
+                    <div class="px-2 sm:px-4 space-y-2">
+                        <!-- Desktop Header -->
+                        <div class="verb-grid-header grid grid-cols-12 gap-2 px-6 py-2 text-[8px] font-black uppercase tracking-widest text-white/20">
+                            <div class="col-span-1"></div>
+                            <div class="col-span-3 text-center">Infinitive</div>
+                            <div class="col-span-3 text-center">Past</div>
+                            <div class="col-span-3 text-center">Participle</div>
+                            <div class="col-span-2 text-right">Arti</div>
+                        </div>
+
+                        ${cat.verbs.map(verb => `
+                            <div class="pop-card p-3 rounded-xl verb-row grid grid-cols-12 items-center gap-1 sm:gap-2">
+                                <!-- Sound Icon -->
+                                <div class="col-span-2 sm:col-span-1 flex justify-center">
+                                    <button onclick="speakVerb('${verb.v1}', '${verb.v2}', '${verb.v3}', this)" class="btn-play rounded-lg">
+                                        <i data-lucide="volume-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- V1 -->
+                                <div class="col-span-3 sm:col-span-3 text-center">
+                                    <span class="verb-cell-label">V1</span>
+                                    <span class="font-bold text-white text-xs sm:text-sm block leading-none">${verb.v1}</span>
+                                    <span class="pronunciation-text">${verb.p1}</span>
+                                </div>
+                                
+                                <!-- V2 -->
+                                <div class="col-span-2 sm:col-span-3 text-center">
+                                    <span class="verb-cell-label">V2</span>
+                                    <span class="font-bold ${cat.color} text-xs sm:text-sm block leading-none">${verb.v2}</span>
+                                    <span class="pronunciation-text">${verb.p2}</span>
+                                </div>
+                                
+                                <!-- V3 -->
+                                <div class="col-span-2 sm:col-span-3 text-center">
+                                    <span class="verb-cell-label">V3</span>
+                                    <span class="font-bold ${cat.color} text-xs sm:text-sm block leading-none">${verb.v3}</span>
+                                    <span class="pronunciation-text">${verb.p3}</span>
+                                </div>
+                                
+                                <!-- Arti -->
+                                <div class="col-span-3 sm:col-span-2 text-right">
+                                    <span class="text-[9px] text-white/40 italic block leading-tight truncate">${verb.arti}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            lucide.createIcons();
+        }
+
+        window.onload = () => {
+            render();
+        };
+    </script>
+</body>
+</html>
